@@ -8,14 +8,27 @@
 		<script src="https://code.jquery.com/jquery-1.11.3.js"></script>
 
 		<script src="/Users/jameskang/code/pubmed/js/app.js"></script>
+
+		<style>
+			.article {
+				border-bottom-style: solid;
+				border-bottom-width: 1px;
+				margin-top: 15px;
+			}
+		</style>
 	</head>
 
 	<body ng-controller="ViewController as view">
 		<div class="container">
 
 			<div id="searchArea">
-				<input type="text" ng-model="searchTerm">
-				<button id="search" ng-click="search(searchTerm)">SEARCH</button>
+				<h3> Search Term 1: </h3><input type="text" ng-model="searchTerm">
+				<h3> Search Term 2 (Optional): </h3><input type="text" ng-model="searchTerm2">
+				
+				<div>
+					<br>
+					<button class="btn btn-default" ng-click="search(searchTerm, searchTerm2)">SEARCH</button>
+				</div>
 			</div>
 
 			<div id="results" ng-show="resultsOn">
@@ -25,11 +38,13 @@
 
 				<h4>Total Number of Results: {{metaSearch.totalResults}}</h4>
 
+				<br><br><br>
+
 				<div ng-repeat="article in articles">
-					<div class="product row">
-						<h3><a href="{{article.link}}">{{article.title}}</a></h3>
-						<h3>{{article.authorsString}}</h3>
-						<h3>{{article.source}} {{article.pubdate}};{{article.volume}}({{article.issue}}):{{article.pages}}</h3>
+					<div class="article">
+						<p><a href="{{article.link}}">{{article.title}}</a></p>
+						<p>{{article.authorsString}}</p>
+						<p>{{article.source}} {{article.pubdate}};{{article.volume}}({{article.issue}}):{{article.pages}}</p>
 					</div>
 				</div>
 

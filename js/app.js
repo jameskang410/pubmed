@@ -4,8 +4,8 @@ var app = angular.module('pubMedApp', []);
 app.controller('ViewController', ['$scope', function($scope) {
 
 	//basically just calling in searches from user input (searchTerm)
-	$scope.search = function(searchTerm) {
-		$scope.articles = getArticleDetails(searchTerm);
+	$scope.search = function(searchTerm, searchTerm2) {
+		$scope.articles = getArticleDetails(searchTerm, searchTerm2);
 		$scope.metaSearch = metaSearch;
 		console.log(metaSearch);
 
@@ -19,10 +19,17 @@ var metaSearch;
 
 //input: article IDs as string
 //output: JSON with all appropriate article data
-function getArticleDetails(searchTerm) {
-	
-	var idString = getIdString(searchTerm);
-	var fullDetailLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' + idString + '&retmode=json';
+function getArticleDetails(searchTerm, searchTerm2) {
+
+	if (searchTerm2 === undefined) {
+		var idString = getIdString(searchTerm);
+	}
+	else {
+		var idString = getIdString(searchTerm, searchTerm2);
+	}
+
+	var fullDetailLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' 
+							+ idString + '&retmode=json';
 
 	var articleJSON;
 
@@ -47,6 +54,7 @@ function getArticleDetails(searchTerm) {
 
 		else {
 			//creating an array of all authors
+			//if there's a speed issue with the code, it's prob here (O(n^2))
 			var authorArray = [];
 			for (j = 0; j < articleJSON[i]["authors"].length; j++) {
 				authorArray.push(articleJSON[i]["authors"][j]["name"]);
@@ -56,7 +64,7 @@ function getArticleDetails(searchTerm) {
 			var link = 'http://www.ncbi.nlm.nih.gov/pubmed/' + i;
 
 			//using unshift() instead of push() 
-			//because the articles are in reverse order
+			//because the articles are iterated in reverse order
 			articleArray.unshift({ "id" : i,
 							    "title" : articleJSON[i]["title"],
 							    "link" : link,
@@ -76,13 +84,25 @@ function getArticleDetails(searchTerm) {
 //helper function for getArticleDetails()
 //input: search term
 //output: IDs as string and JSON with search details
-function getIdString(searchTerm) {
-	
-	//currently set to return 50 - even 100 was really slow
-	var baseLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmax=50&term=';
+function getIdString(searchTerm, searchTerm2) {
+
+	//if searching only 1 term
+	if (searchTerm2 === undefined || searchTerm2 === "") {
+		searchTerm2 = "";
+	}
+	//if searching 2 terms
+	else {
+		searchTerm2 += '[MAJR]';
+	}
+
+	//currently set to return 50 results and articles from the past 4 years (365 * 4 days)
+	//50 is still pretty slow, but 100 was really slow
+	var baseLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&reldate=1460&retmax=50&term=';
 	
 
-	var fullLink = baseLink + searchTerm + '[MAJR]&retmode=json';
+	var fullLink = baseLink + searchTerm + '[MAJR]+AND+' + searchTerm2 + '&retmode=json';
+
+	console.log(fullLink);
 
 	var idString = "";
 	$.ajax({
@@ -90,6 +110,7 @@ function getIdString(searchTerm) {
 		async: false,
 		dataType: 'json',
 		success: function(data) {
+			//calling helper function to get string of IDs
 			idString = parseId(data);
 
 			//also getting some other search info
