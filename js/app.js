@@ -3,7 +3,7 @@ var app = angular.module('pubMedApp', []);
 
 app.controller('ViewController', ['$scope', function($scope) {
 
-	//basically just calling in searches from user input (searchTerm)
+	//basically just calling search terms from user input
 	$scope.search = function(searchTerm, searchTerm2) {
 		$scope.articles = getArticleDetails(searchTerm, searchTerm2);
 		$scope.metaSearch = metaSearch;
@@ -21,9 +21,11 @@ var metaSearch;
 //output: JSON with all appropriate article data
 function getArticleDetails(searchTerm, searchTerm2) {
 
+	//if searching 1 term
 	if (searchTerm2 === undefined) {
 		var idString = getIdString(searchTerm);
 	}
+	//if searching 2 terms
 	else {
 		var idString = getIdString(searchTerm, searchTerm2);
 	}
@@ -98,13 +100,10 @@ function getIdString(searchTerm, searchTerm2) {
 	//currently set to return 50 results and articles from the past 4 years (365 * 4 days)
 	//50 is still pretty slow, but 100 was really slow
 	var baseLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&reldate=1460&retmax=50&term=';
-	
-
 	var fullLink = baseLink + searchTerm + '[MAJR]+AND+' + searchTerm2 + '&retmode=json';
 
-	console.log(fullLink);
-
 	var idString = "";
+
 	$.ajax({
 		url: fullLink,
 		async: false,
@@ -126,12 +125,14 @@ function getIdString(searchTerm, searchTerm2) {
 //input: JSON with IDs
 //output: IDs as string (comma-delimited)
 function parseId(data) {
+
 	var idArray = data.esearchresult.idlist;
 	
 	var idString = "";
 	for (i = 0; i < idArray.length; i++) {
 		idString += idArray[i] + ",";
 	}
+
 	return idString;
 }
 
