@@ -7,7 +7,6 @@ app.controller('ViewController', ['$scope', function($scope) {
 	$scope.search = function(searchTerm, searchTerm2) {
 		$scope.articles = getArticleDetails(searchTerm, searchTerm2);
 		$scope.metaSearch = metaSearch;
-		console.log(metaSearch);
 
 		//showing the hidden results area
 		$scope.resultsOn = true;
@@ -51,7 +50,6 @@ function getArticleDetails(searchTerm, searchTerm2) {
 		//one part of the JSON is "uids" which just lists all of the IDS
 		//skipping this
 		if (i === "uids") {
-
 		}
 
 		else {
@@ -97,9 +95,10 @@ function getIdString(searchTerm, searchTerm2) {
 		searchTerm2 += '[MAJR]';
 	}
 
-	//currently set to return 50 results and articles from the past 4 years (365 * 4 days)
-	//50 is still pretty slow, but 100 was really slow
-	var baseLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&reldate=1460&retmax=50&term=';
+	//reldate=1460 - only returning articles from past 2 years (365 * 2 = 730)
+	//retmax=20 - returning anything more than 20 results is still pretty slow
+	//english[LANG] - only returning articles in english
+	var baseLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&datetype=pdat&reldate=730&retmax=20&term=english[LANG]+';
 	var fullLink = baseLink + searchTerm + '[MAJR]+AND+' + searchTerm2 + '&retmode=json';
 
 	var idString = "";

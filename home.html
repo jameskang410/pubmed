@@ -45,8 +45,9 @@
 				<div ng-repeat="article in articles">
 					<div class="article">
 						<p><a href="{{article.link}}">{{article.title}}</a></p>
-						<p>{{article.authorsString}}</p>
-						<p>{{article.source}} {{article.pubdate}};{{article.volume}}({{article.issue}}):{{article.pages}}</p>
+						<p>{{article.authorsString}}.</p>
+                        <p>{{article.source}}. {{article.pubdate}};{{article.volume}}({{article.issue}}):{{article.pages}}.</p>
+                        <p>PMID: {{article.id}}</p>
 					</div>
 				</div>
 
