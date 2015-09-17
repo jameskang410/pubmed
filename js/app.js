@@ -4,8 +4,8 @@ var app = angular.module('pubMedApp', []);
 app.controller('ViewController', ['$scope', function($scope) {
 
 	//basically just calling search terms from user input
-	$scope.search = function(searchTerm, searchTerm2) {
-		$scope.articles = getArticleDetails(searchTerm, searchTerm2);
+	$scope.search = function(searchTerm, searchTerm2, searchTerm3) {
+		$scope.articles = getArticleDetails(searchTerm, searchTerm2, searchTerm3);
 		$scope.metaSearch = metaSearch;
 
 		//showing the hidden results area
@@ -18,15 +18,15 @@ var metaSearch;
 
 //input: article IDs as string
 //output: JSON with all appropriate article data
-function getArticleDetails(searchTerm, searchTerm2) {
+function getArticleDetails(searchTerm, searchTerm2, searchTerm3) {
 
-	//if searching 1 term
-	if (searchTerm2 === undefined) {
-		var idString = getIdString(searchTerm);
-	}
 	//if searching 2 terms
-	else {
+	if (searchTerm3 === undefined) {
 		var idString = getIdString(searchTerm, searchTerm2);
+	}
+	//if searching 3 terms
+	else {
+		var idString = getIdString(searchTerm, searchTerm2, searchTerm3);
 	}
 
 	var fullDetailLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=pubmed&id=' 
@@ -53,12 +53,6 @@ function getArticleDetails(searchTerm, searchTerm2) {
 		}
 
 		else {
-			//creating an array of all authors
-			//if there's a speed issue with the code, it's prob here (O(n^2))
-			var authorArray = [];
-			for (j = 0; j < articleJSON[i]["authors"].length; j++) {
-				authorArray.push(articleJSON[i]["authors"][j]["name"]);
-			}
 
 			//creating link
 			var link = 'http://www.ncbi.nlm.nih.gov/pubmed/' + i;
@@ -68,8 +62,6 @@ function getArticleDetails(searchTerm, searchTerm2) {
 			articleArray.unshift({ "id" : i,
 							    "title" : articleJSON[i]["title"],
 							    "link" : link,
-								"authors" : authorArray,
-								"authorsString" : authorArray.join(", "),
 								"source" : articleJSON[i]["source"],
 								"pubdate" : articleJSON[i]["pubdate"],
 								"volume" : articleJSON[i]["volume"],
@@ -84,22 +76,25 @@ function getArticleDetails(searchTerm, searchTerm2) {
 //helper function for getArticleDetails()
 //input: search term
 //output: IDs as string and JSON with search details
-function getIdString(searchTerm, searchTerm2) {
+function getIdString(searchTerm, searchTerm2, searchTerm3) {
 
-	//if searching only 1 term
-	if (searchTerm2 === undefined || searchTerm2 === "") {
-		searchTerm2 = "";
+	//if searching only 2 terms
+	if (searchTerm3 === undefined || searchTerm3 === "") {
+		searchTerm3 = "";
 	}
-	//if searching 2 terms
+	//if searching 3 terms
 	else {
-		searchTerm2 += '[MAJR]';
+		searchTerm3 += '[TIAB]';
 	}
 
 	//reldate=1460 - only returning articles from past 2 years (365 * 2 = 730)
 	//retmax=20 - returning anything more than 20 results is still pretty slow
 	//english[LANG] - only returning articles in english
+	//[TIAB] - Searching based on title/abstract
 	var baseLink = 'http://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&datetype=pdat&reldate=730&retmax=20&term=english[LANG]+';
-	var fullLink = baseLink + searchTerm + '[MAJR]+AND+' + searchTerm2 + '&retmode=json';
+	var fullLink = baseLink + searchTerm + '[MAJR]+AND+' + searchTerm2 + '[TIAB]+AND+' + searchTerm3 + '&retmode=json';
+
+	console.log(fullLink);
 
 	var idString = "";
 

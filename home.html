@@ -22,21 +22,35 @@
 		<div class="container">
 
 			<div id="searchArea">
-				<h3> Search Term 1: </h3><input type="text" ng-model="searchTerm">
-				<h3> Search Term 2 (Optional): </h3><input type="text" ng-model="searchTerm2">
+				
+				<h3> Search Term 1 (Major Topic): </h3><input type="text" ng-model="searchTerm">
+				<h3> Search Term 2 (Title/Abstract): </h3><input type="text" ng-model="searchTerm2">
+				<h3> Search Term 3 (Title/Abstract - Optional): </h3><input type="text" ng-model="searchTerm3">
 				
 				<div>
 					<br>
-					<button class="btn btn-default" ng-click="search(searchTerm, searchTerm2)">SEARCH</button>
+<!-- 					The correct way to disable a button is using Angular form -->
+					<button class="btn btn-primary" ng-disabled="searchTerm == '' || !searchTerm || searchTerm2 == '' || !searchTerm2" ng-click="search(searchTerm, searchTerm2, searchTerm3)">SEARCH</button>
 				</div>
 			</div>
 
 			<div id="results" ng-show="resultsOn">
 				
 				<br>
-				
-				<h4>Query Translation:</h4> 
-				<p>{{metaSearch.queryTranslation}}</p>
+				<a href="" ng-click="showQuery=true">
+					<span ng-hide="showQuery">
+						<h4>Show Query Translation</h4>
+					</span>
+				</a>
+				<a href="" ng-click="showQuery=false">
+					<span ng-show="showQuery">
+						<h4>Hide Query Translation</h4>
+					</span>
+				</a>
+
+				<div ng-show="showQuery">
+					<p>{{metaSearch.queryTranslation}}</p>
+				</div>
 
 				<h4>Total Number of Results: {{metaSearch.totalResults}}</h4>
 
@@ -45,9 +59,7 @@
 				<div ng-repeat="article in articles">
 					<div class="article">
 						<p><a href="{{article.link}}">{{article.title}}</a></p>
-						<p>{{article.authorsString}}.</p>
                         <p>{{article.source}}. {{article.pubdate}};{{article.volume}}({{article.issue}}):{{article.pages}}.</p>
-                        <p>PMID: {{article.id}}</p>
 					</div>
 				</div>
 
